@@ -26,6 +26,9 @@ body,
 }
 .controlPanel {
   padding: 2em;
+  display: flex;
+  flex-direction: column;
+  width: 20%;
 }
 
 canvas {
@@ -39,4 +42,25 @@ canvas {
   background: #0002;
   padding: 2em;
   border-radius: 1em;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.filter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #0008;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 1em;
+}
+.hidden-filter {
+  background-color: #0002;
+}
+
+.filterName {
+  flex: 1;
 }

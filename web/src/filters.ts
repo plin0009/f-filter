@@ -3,7 +3,7 @@ export type FilterObject<
     [K in keyof FilterAlgorithms]: {
       name: K;
       args?: FilterAlgorithms[K];
-      visible?: boolean;
+      hidden?: boolean;
     };
   }
 > = T[keyof T];
@@ -44,6 +44,9 @@ export const applyFilters = (
 ) => {
   let pixels = getPixelsFromCanvas(canvas);
   filters.forEach((filter) => {
+    if (filter.hidden) {
+      return;
+    }
     pixels = Filters[filter.name](pixels, filter.args);
   });
 
@@ -53,7 +56,7 @@ export const applyFilters = (
 export const createFilter = ({
   name,
   args = {},
-  visible = true,
+  hidden: visible = true,
 }: FilterObject) => ({ name, args, visible });
 
 const Filters: FilterFunctions = {
