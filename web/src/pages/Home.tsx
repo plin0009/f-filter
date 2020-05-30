@@ -1,8 +1,18 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { FilterObject, applyFilters, createFilter } from "../filters";
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const uploadFileRef = useRef<HTMLInputElement>(null);
+
+  const [filters, setFilters] = useState<FilterObject[]>([]);
+
+  useEffect(() => {
+    if (canvasRef.current === null) {
+      return;
+    }
+    applyFilters(filters, canvasRef.current);
+  }, [filters]);
 
   const uploadImage = () => {
     if (
@@ -15,7 +25,6 @@ const HomePage = () => {
       // file not uploaded
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const image = new Image();
@@ -36,12 +45,36 @@ const HomePage = () => {
   return (
     <main className="App">
       <h1>F-Filter</h1>
-      <div className="canvasWrapper">
-        <canvas
-          ref={canvasRef}
-          width={window.innerWidth}
-          height={window.innerHeight}
-        />
+      <div className="workspace">
+        <div className="canvasWrapper">
+          <canvas
+            ref={canvasRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+          />
+        </div>
+        <div className="controlPanel">
+          <button
+            onClick={() => {
+              if (canvasRef.current === null) {
+                return;
+              }
+              setFilters((f) => [...f, createFilter({ name: "grayscale" })]);
+            }}
+          >
+            Grayscale
+          </button>
+          <button
+            onClick={() => {
+              if (canvasRef.current === null) {
+                return;
+              }
+              setFilters((f) => [...f, createFilter({ name: "sepia" })]);
+            }}
+          >
+            Sepia
+          </button>
+        </div>
       </div>
       <div className="inputFileWrapper">
         <p>Choose image</p>

@@ -12,11 +12,20 @@ body,
   text-align: center;
 }
 
-.canvasWrapper {
-  width: 50%;
+.workspace {
   height: 60%;
+  margin: 2em 0;
+  display: flex;
+  flex-direction: row;
+}
+.canvasWrapper {
+  flex-grow: 1;
+  height: 100%;
   display: flex;
   justify-content: center;
+}
+.controlPanel {
+  padding: 2em;
 }
 
 canvas {
