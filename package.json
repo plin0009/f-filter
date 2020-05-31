@@ -6,7 +6,8 @@
   "scripts": {
     "start-server": "cd ./server/ && npm start",
     "start-web": "cd ./web/ && npm start",
-    "start": "concurrently \"npm run start-server\" \"npm run start-web\""
+    "dev": "concurrently \"npm run start-server\" \"npm run start-web\"",
+    "start": "npm run start-server"
   },
   "repository": {
     "type": "git",
