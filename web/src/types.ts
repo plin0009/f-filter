@@ -12,16 +12,6 @@ export interface ColorHSL {
 
 //export type ColorHue = number;
 
-export type FilterObjectInitialized<
-  T = {
-    [K in keyof FilterAlgorithms]: {
-      name: K;
-      args?: FilterAlgorithms[K];
-      hidden?: boolean;
-    };
-  }
-> = T[keyof T];
-
 export type FilterObject<
   T = {
     [K in keyof FilterAlgorithms]: {
@@ -41,16 +31,37 @@ export type FilterFunctions<
   }
 > = T;
 
-type Override<T> = Pick<DFA, Exclude<keyof DFA, keyof T>> & T;
-interface DFA {
+//type Override<T> = Pick<DFA, Exclude<keyof DFA, keyof T>> & T;
+type Override<T extends (keyof FA)[]> = Pick<
+  DFA,
+  Exclude<keyof DFA, T[number]>
+> &
+  { [K in T[number]]: FA[K] };
+export interface DFA {
   hue?: undefined;
   color?: undefined;
   positiveIntensity?: undefined;
   intensity?: undefined;
 }
+export interface FA {
+  hue: number;
+  color: ColorRGB;
+  positiveIntensity: number;
+  intensity: number;
+}
+export type FAArg<
+  T = {
+    [K in keyof FA]: {
+      key: K;
+      value: FA[K];
+    };
+  }
+> = T[keyof T];
 interface FilterAlgorithms {
-  grayscale: Override<{}>;
-  sepia: Override<{}>;
-  tint: Override<{ hue: number; positiveIntensity: number }>;
-  brightness: Override<{ intensity: number }>;
+  grayscale: Override<[]>;
+  sepia: Override<[]>;
+  //tint: Override<{ hue: number; positiveIntensity: number }>;
+  tint: Override<["hue", "positiveIntensity"]>;
+  //brightness: Override<{ intensity: number }>;
+  brightness: Override<["intensity"]>;
 }
