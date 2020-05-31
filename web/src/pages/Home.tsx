@@ -6,7 +6,7 @@ import { applyFilters } from "../filters";
 import Filter from "../components/Filter";
 import Microphone from "../components/Microphone";
 import textToFilter from "../textToFilter";
-import { codeToFilter } from "../filterCodes";
+import { codeToFilter, filterToCode } from "../filterCodes";
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,6 +17,8 @@ const HomePage = () => {
   const [filters, setFilters] = useState<FilterObject[]>([]);
 
   const [codeInput, setCodeInput] = useState<string>("");
+
+  const [savedFilterCode, setSavedFilterCode] = useState<string | null>(null);
 
   useEffect(() => {
     drawImage();
@@ -69,17 +71,6 @@ const HomePage = () => {
     );
   };
 
-  const pushFilters = (filters: FilterObject[]) => {
-    if (canvasRef.current === null) {
-      return;
-    }
-    setFilters((f) =>
-      update(f, {
-        $push: filters,
-      })
-    );
-  };
-
   const updateFilterArg = (filterIndex: number, { key, value }: FAArg) => {
     setFilters((f) =>
       update(f, {
@@ -91,7 +82,9 @@ const HomePage = () => {
   };
   return (
     <main className="App">
-      <h1>F-Filter</h1>
+      <div className="topBar">
+        <h1 className="title">F-Filter</h1>
+      </div>
       <div className="workspace">
         <div className="canvasWrapper">
           <canvas
@@ -103,105 +96,144 @@ const HomePage = () => {
 
         <div className="controlPanel">
           <div>
-            <Microphone
-              textCallback={(text) => {
-                const filterObject = textToFilter(text);
-                if (filterObject === null) {
-                  return;
-                }
-                console.log(filterObject);
-                pushFilter(filterObject);
-              }}
-            />
-            <input
-              type="text"
-              value={codeInput}
-              onChange={(e) => {
-                setCodeInput(e.target.value);
-              }}
-            />
-            <button
-              onClick={async () => {
-                const { filterObjects } = await codeToFilter(codeInput);
-                //pushFilters(filterObjects);
-                for (let i = 0; i < filterObjects.length; i++) {
-                  const filterObject = {
-                    args: {},
-                    hidden: false,
-                    ...filterObjects[i],
-                  };
+            <div>
+              <div className="dropdown is-hoverable">
+                <div className="dropdown-trigger">
+                  <button className="button is-medium is-rounded">Add</button>
+                </div>
+                <div className="dropdown-menu">
+                  <div className="dropdown-content">
+                    <a
+                      href="#"
+                      className="dropdown-item"
+                      onClick={() => {
+                        pushFilter({
+                          name: "grayscale",
+                          args: {},
+                          hidden: false,
+                        });
+                      }}
+                    >
+                      Grayscale
+                    </a>
+
+                    <a
+                      href="#"
+                      className="dropdown-item"
+                      onClick={() => {
+                        pushFilter({ name: "sepia", args: {}, hidden: false });
+                      }}
+                    >
+                      Sepia
+                    </a>
+
+                    <a
+                      href="#"
+                      className="dropdown-item"
+                      onClick={() => {
+                        pushFilter({
+                          name: "tint",
+                          args: {
+                            hue: 0,
+                            positiveIntensity: 80,
+                          },
+                          hidden: false,
+                        });
+                      }}
+                    >
+                      Tint
+                    </a>
+
+                    <a
+                      href="#"
+                      className="dropdown-item"
+                      onClick={() => {
+                        pushFilter({
+                          name: "brightness",
+                          args: {
+                            intensity: 20,
+                          },
+                          hidden: false,
+                        });
+                      }}
+                    >
+                      Brightness
+                    </a>
+
+                    <a
+                      href="#"
+                      className="dropdown-item"
+                      onClick={() => {
+                        pushFilter({
+                          name: "temperature",
+                          args: {
+                            intensity: 20,
+                          },
+                          hidden: false,
+                        });
+                      }}
+                    >
+                      Temperature
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <Microphone
+                textCallback={(text) => {
+                  const filterObject = textToFilter(text);
+                  if (filterObject === null) {
+                    return;
+                  }
+                  console.log(filterObject);
                   pushFilter(filterObject);
-                }
-              }}
-            >
-              Fetch
-            </button>
+                }}
+              />
+
+              <button
+                className="button is-medium is-rounded"
+                onClick={async () => {
+                  const data = await filterToCode(filters);
+                  const code = data.code;
+                  alert(code);
+                }}
+              >
+                Share
+              </button>
+            </div>
+            <div className="field has-addons">
+              <div className="control is-expanded">
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Have a filter code?"
+                  value={codeInput}
+                  onChange={(e) => {
+                    setCodeInput(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="control">
+                <button
+                  className="button"
+                  onClick={async () => {
+                    const { filterObjects } = await codeToFilter(codeInput);
+                    //pushFilters(filterObjects);
+                    for (let i = 0; i < filterObjects.length; i++) {
+                      const filterObject = {
+                        args: {},
+                        hidden: false,
+                        ...filterObjects[i],
+                      };
+                      pushFilter(filterObject);
+                    }
+                  }}
+                >
+                  Fetch
+                </button>
+              </div>
+            </div>
           </div>
-          <div>
-            <button
-              onClick={() => {
-                pushFilter({
-                  name: "grayscale",
-                  args: {},
-                  hidden: false,
-                });
-              }}
-            >
-              Grayscale
-            </button>
-
-            <button
-              onClick={() => {
-                pushFilter({ name: "sepia", args: {}, hidden: false });
-              }}
-            >
-              Sepia
-            </button>
-
-            <button
-              onClick={() => {
-                pushFilter({
-                  name: "tint",
-                  args: {
-                    hue: 0,
-                    positiveIntensity: 80,
-                  },
-                  hidden: false,
-                });
-              }}
-            >
-              Tint
-            </button>
-
-            <button
-              onClick={() => {
-                pushFilter({
-                  name: "brightness",
-                  args: {
-                    intensity: 20,
-                  },
-                  hidden: false,
-                });
-              }}
-            >
-              Brightness
-            </button>
-
-            <button
-              onClick={() => {
-                pushFilter({
-                  name: "temperature",
-                  args: {
-                    intensity: 20,
-                  },
-                  hidden: false,
-                });
-              }}
-            >
-              Temperature
-            </button>
-          </div>
-
           <div className="filters">
             {filters.map((filter, filterIndex) => (
               <Filter

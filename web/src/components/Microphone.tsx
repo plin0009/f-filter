@@ -50,9 +50,9 @@ const Microphone = ({ textCallback }: MicrophoneProps) => {
   };
 
   return (
-    <div>
-      <button onClick={startListening}>Mic</button>
-    </div>
+    <button className="button is-medium is-rounded" onClick={startListening}>
+      Mic
+    </button>
   );
 };
 
