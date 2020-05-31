@@ -9,7 +9,7 @@
     "build": "babel . -d ./build",
     "serve": "node ./build/index.js",
     "old-start": "npm install && npm run prebuild && npm run build && npm run serve",
-    "start": "babel-node index.js"
+    "start": "npm install && babel-node index.js"
   },
   "keywords": [],
   "author": "",
