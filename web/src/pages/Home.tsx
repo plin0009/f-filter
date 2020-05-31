@@ -12,6 +12,7 @@ const HomePage = () => {
   const uploadFileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
+  const [fileName, setFileName] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterObject[]>([]);
 
   useEffect(() => {
@@ -51,6 +52,7 @@ const HomePage = () => {
       image.src = result;
     };
     reader.readAsDataURL(uploadFileRef.current.files[0]);
+    setFileName(uploadFileRef.current.files[0].name);
   };
 
   const pushFilter = (filter: FilterObject) => {
@@ -214,8 +216,19 @@ const HomePage = () => {
       </div>
 
       <div className="inputFileWrapper">
-        <p>Choose image</p>
         <input type="file" ref={uploadFileRef} onChange={uploadImage} />
+        <a
+          href={canvasRef.current?.toDataURL()}
+          download={fileName}
+          onClick={(e) => {
+            if (canvasRef.current === null) {
+              return;
+            }
+            e.currentTarget.href = canvasRef.current.toDataURL();
+          }}
+        >
+          Save
+        </a>
       </div>
     </main>
   );
