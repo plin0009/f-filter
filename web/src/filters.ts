@@ -137,10 +137,8 @@ const Filters: FilterFunctions = {
   },
   tint: (pixelData, { hue, positiveIntensity }) => {
     const pixels = pixelData.data;
-    //const HSLcolor = RGBtoHSL(color);
     const tintMultiplier = positiveIntensity / 100;
     const originalMultiplier = 1 - tintMultiplier;
-    console.log(tintMultiplier, originalMultiplier);
 
     for (let i = 0; i < pixels.length; i += 4) {
       const r = pixels[i];
@@ -154,6 +152,35 @@ const Filters: FilterFunctions = {
       pixels[i] = newR * tintMultiplier + r * originalMultiplier;
       pixels[i + 1] = newG * tintMultiplier + g * originalMultiplier;
       pixels[i + 2] = newB * tintMultiplier + b * originalMultiplier;
+    }
+
+    return pixelData;
+  },
+  brightness: (pixelData, { intensity }) => {
+    const pixels = pixelData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+      //const a = pixels[i + 3];
+      const { h, s, l: oldL } = RGBtoHSL({ r, g, b });
+
+      let l = oldL + intensity / 100;
+      if (l > 1) {
+        l = 1;
+      } else if (l < 0) {
+        l = 0;
+      }
+      const { r: newR, g: newG, b: newB } = HSLtoRGB({
+        h,
+        s,
+        l,
+      });
+
+      pixels[i] = newR;
+      pixels[i + 1] = newG;
+      pixels[i + 2] = newB;
     }
 
     return pixelData;

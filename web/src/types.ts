@@ -46,9 +46,11 @@ interface DFA {
   hue?: undefined;
   color?: undefined;
   positiveIntensity?: undefined;
+  intensity?: undefined;
 }
 interface FilterAlgorithms {
   grayscale: Override<{}>;
   sepia: Override<{}>;
   tint: Override<{ hue: number; positiveIntensity: number }>;
+  brightness: Override<{ intensity: number }>;
 }

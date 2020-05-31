@@ -10,6 +10,7 @@ interface FilterProps {
   onRemove: () => void;
   onChangeColor?: (newColor: ColorRGB) => void;
   onChangeHue?: (newHue: number) => void;
+  onChangeIntensity?: (newIntensity: number) => void;
   onChangePositiveIntensity?: (newPositiveIntensity: number) => void;
 }
 
@@ -19,6 +20,7 @@ const Filter = ({
   onRemove,
   onChangeColor,
   onChangeHue,
+  onChangeIntensity,
   onChangePositiveIntensity,
 }: FilterProps) => {
   return (
@@ -55,6 +57,22 @@ const Filter = ({
               onChangeColor(rgb);
             }}
             disableAlpha
+          />
+        ) : null}
+        {filterObject?.args?.intensity !== undefined ? (
+          <input
+            type="range"
+            min={-100}
+            max={100}
+            value={filterObject.args.intensity}
+            onChange={(e) => {
+              const newValue = +e.target.value;
+              console.log(newValue);
+              if (onChangeIntensity === undefined) {
+                return;
+              }
+              onChangeIntensity(newValue);
+            }}
           />
         ) : null}
         {filterObject?.args?.positiveIntensity !== undefined ? (

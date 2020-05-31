@@ -52,9 +52,9 @@ canvas {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #0008;
-  padding: 1em;
-  margin: 1em 0;
+  background-color: #0003;
+  padding: 0 1em;
+  margin: 0.5em 0;
   border-radius: 1em;
 }
 .filterTop {
@@ -65,8 +65,11 @@ canvas {
   position: relative;
   width: 100%;
 }
+input[type="range"] {
+  width: 100%;
+}
 .hidden-filter {
-  background-color: #0002;
+  background-color: #0001;
 }
 
 .filterName {

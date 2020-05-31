@@ -103,7 +103,7 @@ const HomePage = () => {
                       {
                         name: "tint",
                         args: {
-                          hue: 360,
+                          hue: 0,
                           positiveIntensity: 100,
                         },
                         hidden: false,
@@ -114,6 +114,28 @@ const HomePage = () => {
               }}
             >
               Tint
+            </button>
+            <button
+              onClick={() => {
+                if (canvasRef.current === null) {
+                  return;
+                }
+                setFilters((f) =>
+                  update(f, {
+                    $push: [
+                      {
+                        name: "brightness",
+                        args: {
+                          intensity: 50,
+                        },
+                        hidden: false,
+                      },
+                    ],
+                  })
+                );
+              }}
+            >
+              Brightness
             </button>
           </div>
           <div className="filters">
@@ -127,6 +149,19 @@ const HomePage = () => {
                           update(f, {
                             [filterIndex]: {
                               args: { hue: { $set: newHue } },
+                            },
+                          })
+                        );
+                      }
+                    : undefined
+                }
+                onChangeIntensity={
+                  filter.args.intensity !== undefined
+                    ? (newIntensity) => {
+                        setFilters((f) =>
+                          update(f, {
+                            [filterIndex]: {
+                              args: { intensity: { $set: newIntensity } },
                             },
                           })
                         );
