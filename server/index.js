@@ -1,19 +1,38 @@
 import express from "express";
 import mongoose from "mongoose";
+import { connectionString } from "./config";
+import { Filter } from "./models";
+import { generateCode } from "./CodeGenerator";
 
 const app = express();
 const port = 8000;
 
 app.use(express.json());
 
-app.post("/new", (req, res) => {
+app.post("/new", async (req, res) => {
   console.log(req.body);
-  res.json({});
+  const filter = new Filter({
+    code: generateCode(),
+    filterObjects: req.body.filterObjects,
+  });
+  await filter.save();
+  res.json(filter);
 });
 
-app.get("/:id", (req, res) => {
+app.get("/:id", async (req, res) => {
   console.log(req.params.id);
-  res.json({});
+  const filter = await Filter.findOne({ code: req.params.id });
+  if (filter === null) {
+    return res.json(null);
+  }
+  return res.json(filter);
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+(async () => {
+  await mongoose.connect(connectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+})();

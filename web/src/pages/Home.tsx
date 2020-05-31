@@ -6,6 +6,7 @@ import { applyFilters } from "../filters";
 import Filter from "../components/Filter";
 import Microphone from "../components/Microphone";
 import textToFilter from "../textToFilter";
+import { codeToFilter } from "../filterCodes";
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,6 +15,8 @@ const HomePage = () => {
 
   const [fileName, setFileName] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterObject[]>([]);
+
+  const [codeInput, setCodeInput] = useState<string>("");
 
   useEffect(() => {
     drawImage();
@@ -66,6 +69,17 @@ const HomePage = () => {
     );
   };
 
+  const pushFilters = (filters: FilterObject[]) => {
+    if (canvasRef.current === null) {
+      return;
+    }
+    setFilters((f) =>
+      update(f, {
+        $push: filters,
+      })
+    );
+  };
+
   const updateFilterArg = (filterIndex: number, { key, value }: FAArg) => {
     setFilters((f) =>
       update(f, {
@@ -99,6 +113,21 @@ const HomePage = () => {
                 pushFilter(filterObject);
               }}
             />
+            <input
+              type="text"
+              value={codeInput}
+              onChange={(e) => {
+                setCodeInput(e.target.value);
+              }}
+            />
+            <button
+              onClick={async () => {
+                const { filterObjects } = await codeToFilter(codeInput);
+                pushFilters(filterObjects);
+              }}
+            >
+              Fetch
+            </button>
           </div>
           <div>
             <button
@@ -219,7 +248,7 @@ const HomePage = () => {
         <input type="file" ref={uploadFileRef} onChange={uploadImage} />
         <a
           href={canvasRef.current?.toDataURL()}
-          download={fileName}
+          download={"f-" + fileName}
           onClick={(e) => {
             if (canvasRef.current === null) {
               return;

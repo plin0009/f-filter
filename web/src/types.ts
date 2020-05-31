@@ -11,7 +11,10 @@ export interface ColorHSL {
 }
 
 //export type ColorHue = number;
-
+export interface FilterFromCode {
+  code: string;
+  filterObjects: FilterObject[];
+}
 export type FilterObject<
   T = {
     [K in keyof FilterAlgorithms]: {
