@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "nodemon --exec babel-node -- index.js",
     "prebuild": "rm -rf build/*",
-    "build": "babel -d ./build",
+    "build": "babel . -d ./build",
     "serve": "node ./build/index.js",
-    "start": "npm install && npm run prebuild && npm run build && npm run serve"
+    "old-start": "npm install && npm run prebuild && npm run build && npm run serve",
+    "start": "babel-node index.js"
   },
   "keywords": [],
   "author": "",
