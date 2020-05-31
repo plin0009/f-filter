@@ -1,0 +1,26 @@
+{
+  "name": "f-filter",
+  "version": "1.0.0",
+  "description": "Started at MasseyHacks VI.",
+  "main": "index.js",
+  "scripts": {
+    "start-server": "cd ./server/ && npm start",
+    "start-web": "cd ./web/ && npm start",
+    "start": "concurrently \"npm run start-server\" \"npm run start-web\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plin0009/f-filter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/plin0009/f-filter/issues"
+  },
+  "homepage": "https://github.com/plin0009/f-filter#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^5.2.0"
+  }
+}
