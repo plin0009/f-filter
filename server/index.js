@@ -5,7 +5,7 @@ import { Filter } from "./models";
 import { generateCode } from "./CodeGenerator";
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 
