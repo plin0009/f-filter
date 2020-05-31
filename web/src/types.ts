@@ -64,4 +64,5 @@ interface FilterAlgorithms {
   tint: Override<["hue", "positiveIntensity"]>;
   //brightness: Override<{ intensity: number }>;
   brightness: Override<["intensity"]>;
+  temperature: Override<["intensity"]>;
 }

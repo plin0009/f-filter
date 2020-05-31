@@ -31,7 +31,7 @@ export const applyFilters = (
 };
 
 // color functions
-const RGBtoHSL: (rgb: ColorRGB) => ColorHSL = ({ r, g, b }) => {
+export const RGBtoHSL: (rgb: ColorRGB) => ColorHSL = ({ r, g, b }) => {
   const R = r / 255;
   const G = g / 255;
   const B = b / 255;
@@ -49,7 +49,7 @@ const RGBtoHSL: (rgb: ColorRGB) => ColorHSL = ({ r, g, b }) => {
     s = chroma / (1 - Math.abs(2 * l - 1));
     switch (max) {
       case R:
-        h = ((G - B) / chroma) % 6;
+        h = (G - B) / chroma;
         break;
       case G:
         h = (B - R) / chroma + 2;
@@ -62,10 +62,13 @@ const RGBtoHSL: (rgb: ColorRGB) => ColorHSL = ({ r, g, b }) => {
     }
   }
   h *= 60;
+  if (h < 0) {
+    h = 360 + h;
+  }
 
   return { h, s, l };
 };
-const HSLtoRGB: (hsl: ColorHSL) => ColorRGB = ({ h, s, l }) => {
+export const HSLtoRGB: (hsl: ColorHSL) => ColorRGB = ({ h, s, l }) => {
   const chroma = (1 - Math.abs(2 * l - 1)) * s;
   const x = chroma * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = l - chroma / 2;
@@ -181,6 +184,22 @@ const Filters: FilterFunctions = {
       pixels[i] = newR;
       pixels[i + 1] = newG;
       pixels[i + 2] = newB;
+    }
+
+    return pixelData;
+  },
+  temperature: (pixelData, { intensity }) => {
+    const pixels = pixelData.data;
+    const strength = intensity * 0.5;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+
+      pixels[i] = r + strength;
+      pixels[i + 1] = g;
+      pixels[i + 2] = b - strength;
     }
 
     return pixelData;

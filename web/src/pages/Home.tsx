@@ -4,6 +4,8 @@ import update from "immutability-helper";
 import { FilterObject, FAArg } from "../types";
 import { applyFilters } from "../filters";
 import Filter from "../components/Filter";
+import Microphone from "../components/Microphone";
+import textToFilter from "../textToFilter";
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,6 +87,18 @@ const HomePage = () => {
 
         <div className="controlPanel">
           <div>
+            <Microphone
+              textCallback={(text) => {
+                const filterObject = textToFilter(text);
+                if (filterObject === null) {
+                  return;
+                }
+                console.log(filterObject);
+                pushFilter(filterObject);
+              }}
+            />
+          </div>
+          <div>
             <button
               onClick={() => {
                 pushFilter({
@@ -111,7 +125,7 @@ const HomePage = () => {
                   name: "tint",
                   args: {
                     hue: 0,
-                    positiveIntensity: 100,
+                    positiveIntensity: 80,
                   },
                   hidden: false,
                 });
@@ -132,6 +146,20 @@ const HomePage = () => {
               }}
             >
               Brightness
+            </button>
+
+            <button
+              onClick={() => {
+                pushFilter({
+                  name: "temperature",
+                  args: {
+                    intensity: 20,
+                  },
+                  hidden: false,
+                });
+              }}
+            >
+              Temperature
             </button>
           </div>
 
