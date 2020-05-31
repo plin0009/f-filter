@@ -8,7 +8,7 @@
     "prebuild": "rm -rf build/*",
     "build": "babel -d ./build",
     "serve": "node ./build/index.js",
-    "start": "npm run prebuild && npm run build && npm run serve"
+    "start": "npm install && npm run prebuild && npm run build && npm run serve"
   },
   "keywords": [],
   "author": "",
