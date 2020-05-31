@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import { connectionString } from "./config";
+// import { connectionString } from "./config";
 import { Filter } from "./models";
 import { generateCode } from "./CodeGenerator";
 
@@ -31,6 +31,13 @@ app.get("/:id", async (req, res) => {
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 (async () => {
+  const connectionString =
+    process.env.NODE_ENV === "production"
+      ? process.env.CONNECTION_STRING
+      : await import("./config").then(
+          ({ connectionString }) => connectionString
+        );
+
   await mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
