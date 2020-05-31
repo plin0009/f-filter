@@ -123,7 +123,15 @@ const HomePage = () => {
             <button
               onClick={async () => {
                 const { filterObjects } = await codeToFilter(codeInput);
-                pushFilters(filterObjects);
+                //pushFilters(filterObjects);
+                for (let i = 0; i < filterObjects.length; i++) {
+                  const filterObject = {
+                    args: {},
+                    hidden: false,
+                    ...filterObjects[i],
+                  };
+                  pushFilter(filterObject);
+                }
               }}
             >
               Fetch

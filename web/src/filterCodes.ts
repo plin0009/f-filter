@@ -3,10 +3,11 @@ import { FilterFromCode, FilterObject } from "./types";
 const serverURL =
   process.env.NODE_ENV === "production"
     ? "https://f-filter-server.herokuapp.com/"
-    : "http://192.168.0.23:3000";
+    : "http://192.168.0.23:8000";
 
 export const codeToFilter = async (code: string) => {
   const response = await fetch(`${serverURL}/${code}`);
+  console.log(response);
   const json = await response.json();
   return json as FilterFromCode;
 };

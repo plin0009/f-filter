@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 // import { connectionString } from "./config";
 import { Filter } from "./models";
 import { generateCode } from "./CodeGenerator";
@@ -7,6 +8,7 @@ import { generateCode } from "./CodeGenerator";
 const app = express();
 const port = process.env.PORT || 8000;
 
+app.use(cors());
 app.use(express.json());
 
 app.post("/new", async (req, res) => {
