@@ -50,12 +50,20 @@ canvas {
 }
 .filter {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   background-color: #0008;
   padding: 1em;
   margin: 1em 0;
   border-radius: 1em;
+}
+.filterTop {
+  align-self: stretch;
+  display: flex;
+}
+.filterSettings {
+  position: relative;
+  width: 100%;
 }
 .hidden-filter {
   background-color: #0002;
@@ -63,4 +71,12 @@ canvas {
 
 .filterName {
   flex: 1;
+}
+
+.svg-button {
+  all: unset;
+  cursor: pointer;
+  margin: 0.5em;
+  display: flex;
+  align-items: center;
 }

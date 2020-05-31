@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import update from "immutability-helper";
 
-import { FilterObject, applyFilters, createFilter } from "../filters";
+import { FilterObject } from "../types";
+import { applyFilters } from "../filters";
 import Filter from "../components/Filter";
 
 const HomePage = () => {
@@ -68,9 +69,10 @@ const HomePage = () => {
                 if (canvasRef.current === null) {
                   return;
                 }
-                //setFilters((f) => [...f, createFilter({ name: "grayscale" })]);
                 setFilters((f) =>
-                  update(f, { $push: [{ name: "grayscale" }] })
+                  update(f, {
+                    $push: [{ name: "grayscale", args: {}, hidden: false }],
+                  })
                 );
               }}
             >
@@ -81,17 +83,73 @@ const HomePage = () => {
                 if (canvasRef.current === null) {
                   return;
                 }
-                //setFilters((f) => [...f, createFilter({ name: "sepia" })]);
-                setFilters((f) => update(f, { $push: [{ name: "sepia" }] }));
+                setFilters((f) =>
+                  update(f, {
+                    $push: [{ name: "sepia", args: {}, hidden: false }],
+                  })
+                );
               }}
             >
               Sepia
+            </button>
+            <button
+              onClick={() => {
+                if (canvasRef.current === null) {
+                  return;
+                }
+                setFilters((f) =>
+                  update(f, {
+                    $push: [
+                      {
+                        name: "tint",
+                        args: {
+                          hue: 360,
+                          positiveIntensity: 100,
+                        },
+                        hidden: false,
+                      },
+                    ],
+                  })
+                );
+              }}
+            >
+              Tint
             </button>
           </div>
           <div className="filters">
             {filters.map((filter, filterIndex) => (
               <Filter
                 filterObject={filter}
+                onChangeHue={
+                  filter.args.hue !== undefined
+                    ? (newHue) => {
+                        setFilters((f) =>
+                          update(f, {
+                            [filterIndex]: {
+                              args: { hue: { $set: newHue } },
+                            },
+                          })
+                        );
+                      }
+                    : undefined
+                }
+                onChangePositiveIntensity={
+                  filter.args.positiveIntensity !== undefined
+                    ? (newPositiveIntensity) => {
+                        setFilters((f) =>
+                          update(f, {
+                            [filterIndex]: {
+                              args: {
+                                positiveIntensity: {
+                                  $set: newPositiveIntensity,
+                                },
+                              },
+                            },
+                          })
+                        );
+                      }
+                    : undefined
+                }
                 onToggleHide={() => {
                   setFilters((f) =>
                     update(f, {
