@@ -70,9 +70,8 @@ export type FAArg<
 interface FilterAlgorithms {
   grayscale: Override<[]>;
   sepia: Override<[]>;
-  //tint: Override<{ hue: number; positiveIntensity: number }>;
   tint: Override<["hue", "positiveIntensity"]>;
-  //brightness: Override<{ intensity: number }>;
   brightness: Override<["intensity"]>;
   temperature: Override<["intensity"]>;
+  invert: Override<[]>;
 }

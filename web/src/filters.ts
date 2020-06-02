@@ -121,6 +121,7 @@ export const defaultFilterObjects: DefaultFilterObjects = {
   tint: { args: { hue: 0, positiveIntensity: 80 } },
   brightness: { args: { intensity: 20 } },
   temperature: { args: { intensity: 20 } },
+  invert: {},
 };
 
 const Filters: FilterFunctions = {
@@ -216,6 +217,20 @@ const Filters: FilterFunctions = {
       pixels[i + 2] = b - strength;
     }
 
+    return pixelData;
+  },
+  invert: (pixelData) => {
+    const pixels = pixelData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+
+      pixels[i] = 255 - r;
+      pixels[i + 1] = 255 - g;
+      pixels[i + 2] = 255 - b;
+    }
     return pixelData;
   },
 };
