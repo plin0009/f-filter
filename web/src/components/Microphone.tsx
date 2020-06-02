@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import grammar from "../grammar";
+import { MicrophoneSVG } from "./svgs";
 
 interface MicrophoneProps {
   textCallback: (text: string) => void;
@@ -50,8 +51,8 @@ const Microphone = ({ textCallback }: MicrophoneProps) => {
   };
 
   return (
-    <button className="button is-medium is-rounded" onClick={startListening}>
-      Mic
+    <button className="svg-button" onClick={startListening}>
+      <MicrophoneSVG size="2em" />
     </button>
   );
 };

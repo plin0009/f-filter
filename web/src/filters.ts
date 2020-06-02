@@ -1,4 +1,10 @@
-import { FilterObject, FilterFunctions, ColorRGB, ColorHSL } from "./types";
+import {
+  FilterObject,
+  FilterFunctions,
+  ColorRGB,
+  ColorHSL,
+  DefaultFilterObjects,
+} from "./types";
 
 const getPixelsFromCanvas = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext("2d");
@@ -107,6 +113,14 @@ export const HSLtoRGB: (hsl: ColorHSL) => ColorRGB = ({ h, s, l }) => {
   const g = (G + m) * 255;
   const b = (B + m) * 255;
   return { r, g, b };
+};
+
+export const defaultFilterObjects: DefaultFilterObjects = {
+  grayscale: {},
+  sepia: {},
+  tint: { args: { hue: 0, positiveIntensity: 80 } },
+  brightness: { args: { intensity: 20 } },
+  temperature: { args: { intensity: 20 } },
 };
 
 const Filters: FilterFunctions = {

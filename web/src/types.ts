@@ -34,7 +34,14 @@ export type FilterFunctions<
   }
 > = T;
 
-//type Override<T> = Pick<DFA, Exclude<keyof DFA, keyof T>> & T;
+export type DefaultFilterObjects<
+  T = {
+    [K in keyof FilterAlgorithms]: {
+      args?: FilterAlgorithms[K];
+    };
+  }
+> = T;
+
 type Override<T extends (keyof FA)[]> = Pick<
   DFA,
   Exclude<keyof DFA, T[number]>

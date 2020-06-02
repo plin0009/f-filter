@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import update from "immutability-helper";
 
-import { FilterObject, FAArg } from "../types";
-import { applyFilters } from "../filters";
+import { FilterObject, FAArg, DefaultFilterObjects } from "../types";
+import { applyFilters, defaultFilterObjects } from "../filters";
 import Filter from "../components/Filter";
 import Microphone from "../components/Microphone";
 import textToFilter from "../textToFilter";
 import { codeToFilter, filterToCode } from "../filterCodes";
+import { PlusSVG, ShareSVG } from "../components/svgs";
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,7 +19,7 @@ const HomePage = () => {
 
   const [codeInput, setCodeInput] = useState<string>("");
 
-  const [savedFilterCode, setSavedFilterCode] = useState<string | null>(null);
+  //const [savedFilterCode, setSavedFilterCode] = useState<string | null>(null);
 
   useEffect(() => {
     drawImage();
@@ -80,210 +81,159 @@ const HomePage = () => {
       })
     );
   };
+
   return (
     <main className="App">
       <div className="topBar">
         <h1 className="title">F-Filter</h1>
       </div>
       <div className="workspace">
-        <div className="canvasWrapper">
-          <canvas
-            ref={canvasRef}
-            width={window.innerWidth}
-            height={window.innerHeight}
-          />
-        </div>
+        <div className="workspaceWrapper">
+          <div className="canvasWrapper">
+            <canvas
+              ref={canvasRef}
+              width={window.innerWidth}
+              height={window.innerHeight}
+            />
+          </div>
 
-        <div className="controlPanel">
-          <div>
+          <div className="controlPanel">
             <div>
-              <div className="dropdown is-hoverable">
-                <div className="dropdown-trigger">
-                  <button className="button is-medium is-rounded">Add</button>
-                </div>
-                <div className="dropdown-menu">
-                  <div className="dropdown-content">
-                    <a
-                      href="#"
-                      className="dropdown-item"
-                      onClick={() => {
-                        pushFilter({
-                          name: "grayscale",
-                          args: {},
-                          hidden: false,
-                        });
-                      }}
-                    >
-                      Grayscale
-                    </a>
-
-                    <a
-                      href="#"
-                      className="dropdown-item"
-                      onClick={() => {
-                        pushFilter({ name: "sepia", args: {}, hidden: false });
-                      }}
-                    >
-                      Sepia
-                    </a>
-
-                    <a
-                      href="#"
-                      className="dropdown-item"
-                      onClick={() => {
-                        pushFilter({
-                          name: "tint",
-                          args: {
-                            hue: 0,
-                            positiveIntensity: 80,
-                          },
-                          hidden: false,
-                        });
-                      }}
-                    >
-                      Tint
-                    </a>
-
-                    <a
-                      href="#"
-                      className="dropdown-item"
-                      onClick={() => {
-                        pushFilter({
-                          name: "brightness",
-                          args: {
-                            intensity: 20,
-                          },
-                          hidden: false,
-                        });
-                      }}
-                    >
-                      Brightness
-                    </a>
-
-                    <a
-                      href="#"
-                      className="dropdown-item"
-                      onClick={() => {
-                        pushFilter({
-                          name: "temperature",
-                          args: {
-                            intensity: 20,
-                          },
-                          hidden: false,
-                        });
-                      }}
-                    >
-                      Temperature
-                    </a>
+              <div className="buttonBar">
+                <div className="dropdown is-hoverable">
+                  <div className="dropdown-trigger">
+                    <button className="svg-button">
+                      <PlusSVG size="2em" />
+                    </button>
+                  </div>
+                  <div className="dropdown-menu">
+                    <div className="dropdown-content">
+                      {(Object.keys(defaultFilterObjects) as Array<
+                        keyof DefaultFilterObjects
+                      >).map((name) => (
+                        <button
+                          className="not-button dropdown-item"
+                          onClick={() => {
+                            const newFilter = {
+                              name,
+                              args: { ...defaultFilterObjects[name].args },
+                              hidden: false,
+                            } as FilterObject;
+                            pushFilter(newFilter);
+                          }}
+                        >
+                          {name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <Microphone
-                textCallback={(text) => {
-                  const filterObject = textToFilter(text);
-                  if (filterObject === null) {
-                    return;
-                  }
-                  console.log(filterObject);
-                  pushFilter(filterObject);
-                }}
-              />
-
-              <button
-                className="button is-medium is-rounded"
-                onClick={async () => {
-                  const data = await filterToCode(filters);
-                  const code = data.code;
-                  alert(code);
-                }}
-              >
-                Share
-              </button>
-            </div>
-            <div className="field has-addons">
-              <div className="control is-expanded">
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="Have a filter code?"
-                  value={codeInput}
-                  onChange={(e) => {
-                    setCodeInput(e.target.value);
+                <Microphone
+                  textCallback={(text) => {
+                    const filterObject = textToFilter(text);
+                    if (filterObject === null) {
+                      return;
+                    }
+                    console.log(filterObject);
+                    pushFilter(filterObject);
                   }}
                 />
-              </div>
-              <div className="control">
                 <button
-                  className="button"
+                  className="svg-button"
                   onClick={async () => {
-                    const { filterObjects } = await codeToFilter(codeInput);
-                    //pushFilters(filterObjects);
-                    for (let i = 0; i < filterObjects.length; i++) {
-                      const filterObject = {
-                        args: {},
-                        hidden: false,
-                        ...filterObjects[i],
-                      };
-                      pushFilter(filterObject);
-                    }
+                    const data = await filterToCode(filters);
+                    const code = data.code;
+                    alert(code);
                   }}
                 >
-                  Fetch
+                  <ShareSVG size="2em" />
                 </button>
               </div>
+              <div className="field has-addons">
+                <div className="control is-expanded">
+                  <input
+                    className="input is-small"
+                    type="text"
+                    placeholder="Have a filter code?"
+                    value={codeInput}
+                    onChange={(e) => {
+                      setCodeInput(e.target.value);
+                    }}
+                  />
+                </div>
+                <div className="control">
+                  <button
+                    className="button is-small"
+                    onClick={async () => {
+                      const { filterObjects } = await codeToFilter(codeInput);
+                      //pushFilters(filterObjects);
+                      for (let i = 0; i < filterObjects.length; i++) {
+                        const filterObject = {
+                          args: {},
+                          hidden: false,
+                          ...filterObjects[i],
+                        };
+                        pushFilter(filterObject);
+                      }
+                    }}
+                  >
+                    Fetch
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="filters">
-            {filters.map((filter, filterIndex) => (
-              <Filter
-                filterObject={filter}
-                onChangeHue={
-                  filter.args.hue !== undefined
-                    ? (newHue) => {
-                        updateFilterArg(filterIndex, {
-                          key: "hue",
-                          value: newHue,
-                        });
-                      }
-                    : undefined
-                }
-                onChangeIntensity={
-                  filter.args.intensity !== undefined
-                    ? (newIntensity) => {
-                        updateFilterArg(filterIndex, {
-                          key: "intensity",
-                          value: newIntensity,
-                        });
-                      }
-                    : undefined
-                }
-                onChangePositiveIntensity={
-                  filter.args.positiveIntensity !== undefined
-                    ? (newPositiveIntensity) => {
-                        updateFilterArg(filterIndex, {
-                          key: "positiveIntensity",
-                          value: newPositiveIntensity,
-                        });
-                      }
-                    : undefined
-                }
-                onToggleHide={() => {
-                  setFilters((f) =>
-                    update(f, {
-                      [filterIndex]: { hidden: { $set: !filter.hidden } },
-                    })
-                  );
-                }}
-                onRemove={() => {
-                  setFilters((f) => update(f, { $splice: [[filterIndex, 1]] }));
-                }}
-              />
-            ))}
+            <div className="filters">
+              {filters.map((filter, filterIndex) => (
+                <Filter
+                  filterObject={filter}
+                  onChangeHue={
+                    filter.args.hue !== undefined
+                      ? (newHue) => {
+                          updateFilterArg(filterIndex, {
+                            key: "hue",
+                            value: newHue,
+                          });
+                        }
+                      : undefined
+                  }
+                  onChangeIntensity={
+                    filter.args.intensity !== undefined
+                      ? (newIntensity) => {
+                          updateFilterArg(filterIndex, {
+                            key: "intensity",
+                            value: newIntensity,
+                          });
+                        }
+                      : undefined
+                  }
+                  onChangePositiveIntensity={
+                    filter.args.positiveIntensity !== undefined
+                      ? (newPositiveIntensity) => {
+                          updateFilterArg(filterIndex, {
+                            key: "positiveIntensity",
+                            value: newPositiveIntensity,
+                          });
+                        }
+                      : undefined
+                  }
+                  onToggleHide={() => {
+                    setFilters((f) =>
+                      update(f, {
+                        [filterIndex]: { hidden: { $set: !filter.hidden } },
+                      })
+                    );
+                  }}
+                  onRemove={() => {
+                    setFilters((f) =>
+                      update(f, { $splice: [[filterIndex, 1]] })
+                    );
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
       <div className="inputFileWrapper">
         <input type="file" ref={uploadFileRef} onChange={uploadImage} />
         <a
