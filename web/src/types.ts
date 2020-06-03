@@ -10,6 +10,12 @@ export interface ColorHSL {
   l: number;
 }
 
+export interface ColorHSV {
+  h: number;
+  s: number;
+  v: number;
+}
+
 //export type ColorHue = number;
 export interface FilterFromCode {
   code: string;
@@ -69,9 +75,9 @@ export type FAArg<
 > = T[keyof T];
 interface FilterAlgorithms {
   grayscale: Override<[]>;
+  invert: Override<[]>;
   sepia: Override<[]>;
   tint: Override<["hue", "positiveIntensity"]>;
   brightness: Override<["intensity"]>;
   temperature: Override<["intensity"]>;
-  invert: Override<[]>;
 }

@@ -3,6 +3,7 @@ import {
   FilterFunctions,
   ColorRGB,
   ColorHSL,
+  ColorHSV,
   DefaultFilterObjects,
 } from "./types";
 
@@ -115,13 +116,91 @@ export const HSLtoRGB: (hsl: ColorHSL) => ColorRGB = ({ h, s, l }) => {
   return { r, g, b };
 };
 
+export const RGBtoHSV: (rgb: ColorRGB) => ColorHSV = ({ r, g, b }) => {
+  const R = r / 255;
+  const G = g / 255;
+  const B = b / 255;
+
+  const max = R > G ? (R > B ? R : G > B ? G : B) : G > B ? G : B;
+  const min = R < G ? (R < B ? R : G < B ? G : B) : G < B ? G : B;
+  const chroma = max - min;
+
+  const v = max;
+  let h, s;
+  if (chroma === 0) {
+    h = 0;
+    s = 0;
+  } else {
+    s = chroma / v;
+    switch (max) {
+      case R:
+        h = (G - B) / chroma;
+        break;
+      case G:
+        h = (B - R) / chroma + 2;
+        break;
+      case B:
+        h = (R - G) / chroma + 4;
+        break;
+      default:
+        h = 0;
+    }
+  }
+  h *= 60;
+  if (h < 0) {
+    h = 360 + h;
+  }
+
+  return { h, s, v };
+};
+export const HSVtoRGB: (hsb: ColorHSV) => ColorRGB = ({ h, s, v }) => {
+  const chroma = v * s;
+  const x = chroma * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - chroma;
+  let R, G, B;
+  if (h < 60) {
+    R = chroma;
+    G = x;
+    B = 0;
+  } else if (h < 120) {
+    R = x;
+    G = chroma;
+    B = 0;
+  } else if (h < 180) {
+    R = 0;
+    G = chroma;
+    B = x;
+  } else if (h < 240) {
+    R = 0;
+    G = x;
+    B = chroma;
+  } else if (h < 300) {
+    R = x;
+    G = 0;
+    B = chroma;
+  } else if (h < 360) {
+    R = chroma;
+    G = 0;
+    B = x;
+  } else {
+    R = 0;
+    G = 0;
+    B = 0;
+  }
+
+  const r = (R + m) * 255;
+  const g = (G + m) * 255;
+  const b = (B + m) * 255;
+  return { r, g, b };
+};
+
 export const defaultFilterObjects: DefaultFilterObjects = {
   grayscale: {},
+  invert: {},
   sepia: {},
   tint: { args: { hue: 0, positiveIntensity: 80 } },
   brightness: { args: { intensity: 20 } },
   temperature: { args: { intensity: 20 } },
-  invert: {},
 };
 
 const Filters: FilterFunctions = {
@@ -136,6 +215,20 @@ const Filters: FilterFunctions = {
       const v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
       pixels[i] = pixels[i + 1] = pixels[i + 2] = v;
+    }
+    return pixelData;
+  },
+  invert: (pixelData) => {
+    const pixels = pixelData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+
+      pixels[i] = 255 - r;
+      pixels[i + 1] = 255 - g;
+      pixels[i + 2] = 255 - b;
     }
     return pixelData;
   },
@@ -182,18 +275,19 @@ const Filters: FilterFunctions = {
       const g = pixels[i + 1];
       const b = pixels[i + 2];
       //const a = pixels[i + 3];
-      const { h, s, l: oldL } = RGBtoHSL({ r, g, b });
+      //const { h, s, l: oldL } = RGBtoHSL({ r, g, b });
+      const { h, s, v: oldV } = RGBtoHSV({ r, g, b });
 
-      let l = oldL + intensity / 100;
-      if (l > 1) {
-        l = 1;
-      } else if (l < 0) {
-        l = 0;
+      let v = oldV + intensity / 100;
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
       }
-      const { r: newR, g: newG, b: newB } = HSLtoRGB({
+      const { r: newR, g: newG, b: newB } = HSVtoRGB({
         h,
         s,
-        l,
+        v,
       });
 
       pixels[i] = newR;
@@ -217,20 +311,6 @@ const Filters: FilterFunctions = {
       pixels[i + 2] = b - strength;
     }
 
-    return pixelData;
-  },
-  invert: (pixelData) => {
-    const pixels = pixelData.data;
-
-    for (let i = 0; i < pixels.length; i += 4) {
-      const r = pixels[i];
-      const g = pixels[i + 1];
-      const b = pixels[i + 2];
-
-      pixels[i] = 255 - r;
-      pixels[i + 1] = 255 - g;
-      pixels[i + 2] = 255 - b;
-    }
     return pixelData;
   },
 };
