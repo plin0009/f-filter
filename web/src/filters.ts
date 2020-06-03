@@ -275,19 +275,18 @@ const Filters: FilterFunctions = {
       const g = pixels[i + 1];
       const b = pixels[i + 2];
       //const a = pixels[i + 3];
-      //const { h, s, l: oldL } = RGBtoHSL({ r, g, b });
-      const { h, s, v: oldV } = RGBtoHSV({ r, g, b });
+      const { h, s, l: oldL } = RGBtoHSL({ r, g, b });
 
-      let v = oldV + intensity / 100;
-      if (v > 1) {
-        v = 1;
-      } else if (v < 0) {
-        v = 0;
+      let l = oldL + intensity / 100;
+      if (l > 1) {
+        l = 1;
+      } else if (l < 0) {
+        l = 0;
       }
-      const { r: newR, g: newG, b: newB } = HSVtoRGB({
+      const { r: newR, g: newG, b: newB } = HSLtoRGB({
         h,
         s,
-        v,
+        l,
       });
 
       pixels[i] = newR;
