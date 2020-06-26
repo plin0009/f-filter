@@ -5,6 +5,7 @@ import {
   ColorHSL,
   ColorHSV,
   DefaultFilterObjects,
+  Curve,
 } from "./types";
 
 const getPixelsFromCanvas = (canvas: HTMLCanvasElement) => {
@@ -194,6 +195,69 @@ export const HSVtoRGB: (hsb: ColorHSV) => ColorRGB = ({ h, s, v }) => {
   return { r, g, b };
 };
 
+const getSecondDerivative = (curve: Curve) => {
+  const matrix = Array(curve.length)
+    .fill(undefined)
+    .map(() =>
+      Array(3)
+        .fill(undefined)
+        .map(() => 0)
+    );
+  const result = Array(curve.length).fill(0);
+
+  matrix[0][1] = 1;
+  for (let i = 1; i < curve.length - 1; i++) {
+    matrix[i][0] = (curve[i].x - curve[i - 1].x) / 6;
+    matrix[i][1] = (curve[i + 1].x - curve[i - 1].x) / 3;
+    matrix[i][2] = (curve[i + 1].x - curve[i].x) / 6;
+    result[i] =
+      (curve[i + 1].y - curve[i].y) / (curve[i + 1].x - curve[i].x) -
+      (curve[i].y - curve[i - 1].y) / (curve[i].x - curve[i - 1].x);
+  }
+  matrix[curve.length - 1][1] = 1;
+
+  for (let i = 1; i < curve.length; i++) {
+    const k = matrix[i][0] / matrix[i - 1][1];
+    matrix[i][1] -= k * matrix[i - 1][2];
+    matrix[i][0] = 0;
+    result[i] -= k * result[i - 1];
+  }
+  for (let i = curve.length - 2; i >= 0; i--) {
+    const k = matrix[i][2] / matrix[i + 1][1];
+    matrix[i][1] -= k * matrix[i + 1][0];
+    matrix[i][2] = 0;
+    result[i] -= k * result[i + 1];
+  }
+
+  return result.map((value, index) => value / matrix[index][1]);
+};
+
+const getCurveFunction = (curve: Curve) => {
+  const secondDerivative = getSecondDerivative(curve);
+  return (x: number) => {
+    let i = 0;
+    for (i = 0; i < curve.length - 1; i++) {
+      if (x >= curve[i].x) {
+        break;
+      }
+    }
+    const currentPoint = curve[i];
+    const nextPoint = curve[i + 1];
+
+    const h = nextPoint.x - currentPoint.x;
+    const b = (x - currentPoint.x) / h;
+    const a = 1 - b;
+
+    const y =
+      a * currentPoint.y +
+      b * nextPoint.y +
+      ((h * h) / 6) *
+        ((a * a * a - a) * secondDerivative[i] +
+          (b * b * b - b) * secondDerivative[i + 1]);
+    return y;
+  };
+};
+
 export const defaultFilterObjects: DefaultFilterObjects = {
   grayscale: {},
   invert: {},
@@ -201,6 +265,16 @@ export const defaultFilterObjects: DefaultFilterObjects = {
   tint: { args: { hue: 0, positiveIntensity: 80 } },
   brightness: { args: { intensity: 20 } },
   temperature: { args: { intensity: 20 } },
+  redCurve: {
+    args: {
+      curve: [
+        { x: 0, y: 0 },
+        { x: 68, y: 50 },
+        { x: 188, y: 200 },
+        { x: 255, y: 255 },
+      ],
+    },
+  },
 };
 
 const Filters: FilterFunctions = {
@@ -308,6 +382,22 @@ const Filters: FilterFunctions = {
       pixels[i] = r + strength;
       pixels[i + 1] = g;
       pixels[i + 2] = b - strength;
+    }
+
+    return pixelData;
+  },
+  redCurve: (pixelData, { curve }) => {
+    const curveFunction = getCurveFunction(curve);
+    const pixels = pixelData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+
+      pixels[i] = curveFunction(r);
+      pixels[i + 1] = curveFunction(g);
+      pixels[i + 2] = curveFunction(b);
     }
 
     return pixelData;

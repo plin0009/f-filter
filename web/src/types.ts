@@ -1,3 +1,5 @@
+export type Curve = { x: number; y: number }[];
+
 export interface ColorRGB {
   r: number;
   g: number;
@@ -58,12 +60,14 @@ export interface DFA {
   color?: undefined;
   positiveIntensity?: undefined;
   intensity?: undefined;
+  curve?: undefined;
 }
 export interface FA {
   hue: number;
   color: ColorRGB;
   positiveIntensity: number;
   intensity: number;
+  curve: Curve;
 }
 export type FAArg<
   T = {
@@ -80,4 +84,5 @@ interface FilterAlgorithms {
   tint: Override<["hue", "positiveIntensity"]>;
   brightness: Override<["intensity"]>;
   temperature: Override<["intensity"]>;
+  redCurve: Override<["curve"]>;
 }
